@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mad Libs Voice App for Kids</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 2em;
+    }
+    button {
+      font-size: 1.2em;
+      padding: 1em;
+      margin-top: 1em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffcc00;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff9900;
+    }
+    #prompt {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+    }
+    #story {
+      font-size: 1.3em;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 Mad Libs Voice App 🎉</h1>
+  <div id="prompt">Click the button to start!</div>
+  <button onclick="startMadLibs()">Start Story</button>
+  <div id="story"></div>
+  <script src="madlibs.js"></script>
+</body>
+</html>
