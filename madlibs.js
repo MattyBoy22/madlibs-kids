@@ -79,20 +79,20 @@ recognition.onerror = function(event) {
 function createStory() {
   let story = template;
   for (let key in responses) {
-    const regex = new RegExp(`\[${key}\]`, 'g');
+    const regex = new RegExp(`\\[${key}\\]`, 'g');
     story = story.replace(regex, responses[key]);
   }
 
+  // Clean up any special characters just in case
   const cleanStory = story.replace(/[^\w\s.,!?'-]/g, '');
+
   promptEl.textContent = "Here's your story!";
   storyEl.textContent = story;
 
-  const storyKey = document.getElementById("story-select").value;
-  imageEl.src = storyKey + ".png";
-  imageEl.style.display = "block";
-
+  // Speak the clean story
   speak(cleanStory, () => {});
 }
+
 
 function startMadLibs() {
   const storyKey = document.getElementById("story-select").value;
