@@ -11,16 +11,16 @@
       text-align: center;
       padding: 2em;
     }
-    button {
+    button, select {
       font-size: 1.2em;
-      padding: 1em;
+      padding: 0.5em 1em;
       margin-top: 1em;
       border: none;
       border-radius: 10px;
       background-color: #ffcc00;
       cursor: pointer;
     }
-    button:hover {
+    button:hover, select:hover {
       background-color: #ff9900;
     }
     #prompt {
@@ -30,13 +30,30 @@
     #story {
       font-size: 1.3em;
       margin-top: 2em;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #story-image {
+      width: 300px;
+      margin-top: 1em;
+      display: none;
+      border-radius: 15px;
     }
   </style>
 </head>
 <body>
   <h1>🎤 Mad Libs Voice App 🎉</h1>
-  <div id="prompt">Click the button to start!</div>
+  <p>Choose a story:</p>
+  <select id="story-select">
+    <option value="zoo">A Trip to the Zoo</option>
+    <option value="space">Space Adventure</option>
+    <option value="beach">A Day at the Beach</option>
+  </select>
+  <br />
   <button onclick="startMadLibs()">Start Story</button>
+  <div id="prompt">Click the button to start!</div>
+  <img id="story-image" src="" alt="Story illustration" />
   <div id="story"></div>
   <script src="madlibs.js"></script>
 </body>

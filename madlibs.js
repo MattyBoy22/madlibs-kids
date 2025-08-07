@@ -1,18 +1,39 @@
 
-const blanks = [
-  { type: "place", question: "Name a place, like a park or a zoo." },
-  { type: "adjective", question: "Give me an adjective, like silly or big." },
-  { type: "animal", question: "Name an animal, like a dog or elephant." },
-  { type: "verb", question: "Say a verb, like run or jump." }
-];
+const templates = {
+  zoo: {
+    blanks: [
+      { type: "animal", question: "Name an animal, like a lion or giraffe." },
+      { type: "adjective", question: "Give me an adjective, like loud or tall." },
+      { type: "verb", question: "Say a verb, like run or climb." }
+    ],
+    template: "At the zoo, I saw a [adjective] [animal] trying to [verb] up a tree!"
+  },
+  space: {
+    blanks: [
+      { type: "planet", question: "Name a planet, like Mars or Jupiter." },
+      { type: "noun", question: "Say a noun, like spaceship or robot." },
+      { type: "verb", question: "Say a verb, like zoom or spin." }
+    ],
+    template: "We blasted off to [planet] in our [noun] and started to [verb] all over the galaxy!"
+  },
+  beach: {
+    blanks: [
+      { type: "adjective", question: "Give me an adjective, like sunny or breezy." },
+      { type: "food", question: "Name a food, like sandwich or ice cream." },
+      { type: "verb", question: "Say a verb, like swim or build." }
+    ],
+    template: "It was a [adjective] day at the beach. I ate a [food] and tried to [verb] the biggest sandcastle ever!"
+  }
+};
 
-const template = "Today, I went to the [place] with my [adjective] [animal]. We decided to [verb] all afternoon!";
-
+let blanks = [];
+let template = "";
 let responses = {};
 let current = 0;
 
 const promptEl = document.getElementById("prompt");
 const storyEl = document.getElementById("story");
+const imageEl = document.getElementById("story-image");
 
 const synth = window.speechSynthesis;
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -22,6 +43,11 @@ recognition.maxAlternatives = 1;
 
 function speak(text, callback) {
   const utter = new SpeechSynthesisUtterance(text);
+  const voices = window.speechSynthesis.getVoices();
+  const funVoice = voices.find(v => v.name.includes("Google UK English Female") || v.name.includes("Samantha"));
+  if (funVoice) utter.voice = funVoice;
+  utter.pitch = 1.5;
+  utter.rate = 1;
   utter.onend = callback;
   synth.speak(utter);
 }
@@ -53,23 +79,28 @@ recognition.onerror = function(event) {
 function createStory() {
   let story = template;
   for (let key in responses) {
-    const regex = new RegExp(`\\[${key}\\]`, 'g');
+    const regex = new RegExp(`\[${key}\]`, 'g');
     story = story.replace(regex, responses[key]);
   }
 
-  // Clean up any special characters just in case
   const cleanStory = story.replace(/[^\w\s.,!?'-]/g, '');
-
   promptEl.textContent = "Here's your story!";
   storyEl.textContent = story;
 
-  // Speak the clean story
+  const storyKey = document.getElementById("story-select").value;
+  imageEl.src = storyKey + ".png";
+  imageEl.style.display = "block";
+
   speak(cleanStory, () => {});
 }
 
 function startMadLibs() {
+  const storyKey = document.getElementById("story-select").value;
   current = 0;
   responses = {};
   storyEl.textContent = "";
+  imageEl.style.display = "none";
+  blanks = templates[storyKey].blanks;
+  template = templates[storyKey].template;
   askQuestion();
 }
