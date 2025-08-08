@@ -41,11 +41,17 @@ recognition.lang = 'en-US';
 recognition.interimResults = false;
 recognition.maxAlternatives = 1;
 
+let voices = [];
+
+window.speechSynthesis.onvoiceschanged = () => {
+  voices = speechSynthesis.getVoices();
+};
+
 function speak(text, callback) {
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.voice = speechSynthesis.getVoices().find(v => v.name.includes('Google')) || speechSynthesis.getVoices()[0];
-  utterance.pitch = 1.2; // fun tone
-  utterance.rate = 1; // normal speed
+  utterance.voice = voices.find(v => v.name.includes('Google')) || voices[0];
+  utterance.pitch = 1.2;
+  utterance.rate = 1;
   utterance.onend = callback || (() => {});
   speechSynthesis.speak(utterance);
 }
