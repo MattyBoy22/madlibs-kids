@@ -42,14 +42,12 @@ recognition.interimResults = false;
 recognition.maxAlternatives = 1;
 
 function speak(text, callback) {
-  const utter = new SpeechSynthesisUtterance(text);
-  const voices = window.speechSynthesis.getVoices();
-  const funVoice = voices.find(v => v.name.includes("Google UK English Female") || v.name.includes("Samantha"));
-  if (funVoice) utter.voice = funVoice;
-  utter.pitch = 1.5;
-  utter.rate = 1;
-  utter.onend = callback;
-  synth.speak(utter);
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = speechSynthesis.getVoices().find(v => v.name.includes('Google')) || speechSynthesis.getVoices()[0];
+  utterance.pitch = 1.2; // fun tone
+  utterance.rate = 1; // normal speed
+  utterance.onend = callback || (() => {});
+  speechSynthesis.speak(utterance);
 }
 
 function askQuestion() {
@@ -83,14 +81,12 @@ function createStory() {
     story = story.replace(regex, responses[key]);
   }
 
-  // Clean up any special characters just in case
-  const cleanStory = story.replace(/[^\w\s.,!?'-]/g, '');
-
   promptEl.textContent = "Here's your story!";
   storyEl.textContent = story;
 
-  // Speak the clean story
-  speak(cleanStory, () => {});
+  // Speak cleanly without non-speech characters
+  const cleanStory = story.replace(/[^\w\s.,!?'-]/g, '');
+  speak(cleanStory);
 }
 
 
