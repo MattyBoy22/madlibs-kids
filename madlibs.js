@@ -49,9 +49,17 @@ window.speechSynthesis.onvoiceschanged = () => {
 
 function speak(text, callback) {
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.voice = voices.find(v => v.name.includes('Google')) || voices[0];
-  utterance.pitch = 1.2;
-  utterance.rate = 1;
+
+  // Try to find a high-quality voice
+  const preferredVoice = voices.find(v =>
+    v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Daniel')
+  );
+  utterance.voice = preferredVoice || voices[0];
+
+  utterance.pitch = 1.0; // normal pitch
+  utterance.rate = 1.0;  // normal speed
+  utterance.volume = 1.0;
+
   utterance.onend = callback || (() => {});
   speechSynthesis.speak(utterance);
 }
