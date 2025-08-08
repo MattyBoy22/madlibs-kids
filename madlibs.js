@@ -58,24 +58,32 @@ function loadVoices(callback) {
 }
 
 function speak(text, callback) {
+  // Stop any ongoing speech
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+  }
+
   loadVoices(() => {
     const utterance = new SpeechSynthesisUtterance(text);
 
-    // Choose best voice
     const preferredVoice = voices.find(v => v.name.includes("Google US English")) ||
                            voices.find(v => v.name.includes("Samantha")) ||
                            voices.find(v => v.name.includes("Daniel")) ||
                            voices.find(v => v.name.includes("Karen")) ||
-                           voices[0]; // fallback
+                           voices[0];
 
     utterance.voice = preferredVoice;
     utterance.pitch = 1;
     utterance.rate = 1;
     utterance.volume = 1;
-    utterance.onend = callback || (() => {});
 
-    console.log("🗣️ Using voice:", preferredVoice ? preferredVoice.name : "Default");
+    utterance.onend = () => {
+      // Only trigger callback after speech is fully done
+      if (typeof callback === "function") callback();
+    };
+
     speechSynthesis.speak(utterance);
+    console.log("🗣️ Using voice:", preferredVoice ? preferredVoice.name : "Default");
   });
 }
 
@@ -83,8 +91,16 @@ function askQuestion() {
   if (current < blanks.length) {
     const q = blanks[current].question;
     promptEl.textContent = q;
+
+    // Ensure recognition isn't already running
+    if (recognition && recognition.abort) recognition.abort();
+
     speak(q, () => {
-      recognition.start();
+      try {
+        recognition.start();
+      } catch (e) {
+        console.warn("Speech recognition already started:", e);
+      }
     });
   } else {
     createStory();
