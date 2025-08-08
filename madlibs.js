@@ -43,37 +43,41 @@ recognition.maxAlternatives = 1;
 
 let voices = [];
 
-// Wait for voices to load (important!)
-window.speechSynthesis.onvoiceschanged = () => {
+function loadVoices(callback) {
   voices = speechSynthesis.getVoices();
-};
 
-function speak(text, callback) {
-  const utterance = new SpeechSynthesisUtterance(text);
-
-  // Make sure voices are loaded
-  if (!voices.length) {
-    voices = speechSynthesis.getVoices(); // fallback if voices are already loaded
+  if (voices.length) {
+    callback();
+  } else {
+    // Try again once voices are loaded
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+      callback();
+    };
   }
-
-  // Try best natural-sounding voices by order of preference
-  const preferredVoice = voices.find(v => v.name.includes("Google US English")) ||
-                         voices.find(v => v.name.includes("Samantha")) ||
-                         voices.find(v => v.name.includes("Daniel")) ||
-                         voices.find(v => v.name.includes("Karen")) ||
-                         voices.find(v => v.name.includes("Moira")) ||
-                         voices[0];
-
-  utterance.voice = preferredVoice;
-  utterance.pitch = 1.0;
-  utterance.rate = 1.0;
-  utterance.volume = 1.0;
-  utterance.onend = callback || (() => {});
-
-  console.log("Using voice:", preferredVoice.name); // for debugging
-  speechSynthesis.speak(utterance);
 }
 
+function speak(text, callback) {
+  loadVoices(() => {
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Choose best voice
+    const preferredVoice = voices.find(v => v.name.includes("Google US English")) ||
+                           voices.find(v => v.name.includes("Samantha")) ||
+                           voices.find(v => v.name.includes("Daniel")) ||
+                           voices.find(v => v.name.includes("Karen")) ||
+                           voices[0]; // fallback
+
+    utterance.voice = preferredVoice;
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    utterance.volume = 1;
+    utterance.onend = callback || (() => {});
+
+    console.log("🗣️ Using voice:", preferredVoice ? preferredVoice.name : "Default");
+    speechSynthesis.speak(utterance);
+  });
+}
 
 function askQuestion() {
   if (current < blanks.length) {
